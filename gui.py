@@ -13,14 +13,14 @@ class GUI:
         self.top_frame = tk.Frame(master=self.wndw_frame, 
                                          width=800, 
                                          height=100)
-        self.top_frame.pack(fill=tk.X)
+        self.top_frame.pack(fill=tk.X, padx=20, pady=5)
 
         # Toggle Start
         self.start_toggle = tk.Button(master=self.top_frame,
                                       text="Start Position",
                                       pady=5,
                                       command=self.toggle_start)
-        self.start_toggle.pack()
+        self.start_toggle.pack(side=tk.LEFT, padx=10)
         
         self.start_button_toggled = False
 
@@ -30,9 +30,27 @@ class GUI:
                                     pady=5,
                                     command=self.toggle_end)
         
-        self.end_toggle.pack()
+        self.end_toggle.pack(side=tk.LEFT, padx=10)
 
         self.end_button_toggled = False
+
+        # Toggle Barrier
+        self.barrier_toggle = tk.Button(master=self.top_frame,
+                                        text="Create Barrier",
+                                        pady=5,
+                                        command=self.toggle_barrier)
+        self.barrier_toggle.pack(side=tk.LEFT, padx=10)
+
+        self.barrier_button_toggled = False
+
+        # Drop Down Menu
+        self.start_search_button = tk.Button(master=self.top_frame,
+                                      text="Run Maze",
+                                      pady=5,
+                                      command=self.initiate_search)
+
+        self.start_search_button.pack(side=tk.LEFT, padx=10)
+        self.toggle_start_search = False
 
         # Center Grid
         self.grid_frame = tk.Frame(master=self.wndw_frame, 
@@ -64,6 +82,13 @@ class GUI:
                                              "y" : j}
         self.wndw_frame.pack()
     
+    def initiate_search(self):
+        print("started search")
+
+    def change_color(self, x, y, color):
+        self.grid_dict[f'x{x}y{y}']["color"] = color
+        self.grid_dict[f'x{x}y{y}']["label"].configure(background=color)
+
     def toggle_start(self):
         """
         Changes the start button to True or False
@@ -78,6 +103,8 @@ class GUI:
             self.start_toggle.configure(highlightbackground="green")
             if self.end_button_toggled:
                 self.toggle_end()
+            if self.barrier_button_toggled:
+                self.toggle_barrier()
             
     def toggle_end(self):
         """
@@ -91,6 +118,25 @@ class GUI:
         else:
             self.end_button_toggled = True
             self.end_toggle.configure(highlightbackground="red")
+            if self.start_button_toggled:
+                self.toggle_start()
+            if self.barrier_button_toggled:
+                self.toggle_barrier()
+
+    def toggle_barrier(self):
+        """
+        Changes the barrier button to True or False
+        If True it will let you put in a barrier square
+        If False it will not let you make placements of any barrier.
+        """
+        if self.barrier_button_toggled:
+            self.barrier_button_toggled = False
+            self.barrier_toggle.configure(highlightbackground="white")
+        else:
+            self.barrier_button_toggled = True
+            self.barrier_toggle.configure(highlightbackground="black")
+            if self.end_button_toggled:
+                self.toggle_end()
             if self.start_button_toggled:
                 self.toggle_start()
 
@@ -110,6 +156,11 @@ class GUI:
             else:
                 self.delete_position()
                 self.change_to_end(x, y)
+        elif self.barrier_button_toggled:
+            if self.grid_dict[f'x{x}y{y}']["color"] == "white":
+                self.change_color(x, y, "black")
+            else:
+                self.change_color(x, y, "white")
 
     def change_to_start(self, x, y):
         """
@@ -118,22 +169,27 @@ class GUI:
         if self.grid_dict[f'x{x}y{y}']["color"] == "red":
             return
         elif self.grid_dict[f'x{x}y{y}']["color"] == "white":
-            self.grid_dict[f'x{x}y{y}']["color"] = "green"
-            self.grid_dict[f'x{x}y{y}']["label"].configure(background=self.grid_dict[f'x{x}y{y}']["color"])
+            self.change_color(x, y, "green")
         else:
-            self.grid_dict[f'x{x}y{y}']["color"] = "white"
-            self.grid_dict[f'x{x}y{y}']["label"].configure(background=self.grid_dict[f'x{x}y{y}']["color"])
+            self.change_color(x, y, "white")
     
     def change_to_end(self, x, y):
+        """
+        Changes the color of the selected square to red to indicate end position.
+        """
         if self.grid_dict[f'x{x}y{y}']["color"] == "green":
             return
         elif self.grid_dict[f'x{x}y{y}']["color"] == "white":
-            self.grid_dict[f'x{x}y{y}']["color"] = "red"
-            self.grid_dict[f'x{x}y{y}']["label"].configure(background=self.grid_dict[f'x{x}y{y}']["color"])
+            self.change_color(x, y, "red")
         else:
-            self.grid_dict[f'x{x}y{y}']["color"] = "white"
-            self.grid_dict[f'x{x}y{y}']["label"].configure(background=self.grid_dict[f'x{x}y{y}']["color"])
-
+            self.change_color(x, y, "white")
+    
+    def create_barrier(self, x, y):
+        if self.grid_dict[f'x{x}y{y}']["color"] == "green" or self.grid_dict[f'x{x}y{y}']["color"] == "red":
+            return
+        elif self.grid_dict[f'x{x}y{y}']["color"] == "white":
+            self.change_color(x, y, "black")
+        
     def delete_position(self):
         """
         Deletes all other colors to ensure only one start and one end.
