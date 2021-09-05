@@ -1,4 +1,5 @@
 import tkinter as tk
+from mazeHunter import BFS
 import pprint
 
 class GUI:
@@ -71,21 +72,46 @@ class GUI:
         self.grid_dict = {}
 
         # Grid Contents
-        for i in range(25):
-            for j in range(70):
+        self.grid_rows = 4
+        self.grid_columns = 4
+
+        for i in range(self.grid_rows):
+            for j in range(self.grid_columns):
                 label = tk.Label(master=self.grid_frame, text="x")
                 label.grid(row=i, column=j)
                 label.bind('<Double 1>', lambda e, i=i, j=j: self.double_click(i,j))
+
+                top = None
+                bottom = None
+                left = None
+                right = None
+
+                if i - 1 >= 0:
+                    top = (i - 1, j)
+                if i + 1 <= self.grid_rows - 1:
+                    bottom = (i + 1, j)
+                if j - 1 >= 0:
+                    left = (i, j - 1)
+                if j + 1 <= self.grid_columns - 1:
+                    right = (i, j + 1)
+
                 self.grid_dict[f'x{i}y{j}'] = {"label": label,
                                              "color": "white",
                                              "x" : i,
-                                             "y" : j}
+                                             "y" : j,
+                                             "top" : top,
+                                             "bottom": bottom,
+                                             "left": left,
+                                             "right": right}
         self.wndw_frame.pack()
     
     def initiate_search(self):
-        print("started search")
+        BFS(self.grid_dict)
 
     def change_color(self, x, y, color):
+        """
+        Changes color at coordinate to assigned color. Not for the animation funcitonality.
+        """
         self.grid_dict[f'x{x}y{y}']["color"] = color
         self.grid_dict[f'x{x}y{y}']["label"].configure(background=color)
 
@@ -217,7 +243,7 @@ class GUI:
         """
         Returns dictionary containing the data of the grid.
         """
-        return self.grid_dict
+        pprint.pprint(self.grid_dict)
 
 new_grid = GUI()
 new_grid.do_loop()
