@@ -1,6 +1,6 @@
 import tkinter as tk
 from mazeHunter import BFS
-import pprint
+from pprint import pprint
 
 class GUI:
     
@@ -44,7 +44,7 @@ class GUI:
 
         self.barrier_button_toggled = False
 
-        # Drop Down Menu
+        # Start Search
         self.start_search_button = tk.Button(master=self.top_frame,
                                       text="Run Maze",
                                       pady=5,
@@ -53,6 +53,12 @@ class GUI:
         self.start_search_button.pack(side=tk.LEFT, padx=10)
         self.toggle_start_search = False
 
+        self.clear_grid_button = tk.Button(master= self.top_frame,
+                                           text="clear grid",
+                                           pady=5,
+                                           command=self.clear_grid)
+        
+        self.clear_grid_button.pack(side=tk.LEFT, padx=10)
         # Center Grid
         self.grid_frame = tk.Frame(master=self.wndw_frame, 
                             background="black", 
@@ -72,8 +78,8 @@ class GUI:
         self.grid_dict = {}
 
         # Grid Contents
-        self.grid_rows = 4
-        self.grid_columns = 4
+        self.grid_rows = 25
+        self.grid_columns = 70
 
         for i in range(self.grid_rows):
             for j in range(self.grid_columns):
@@ -87,13 +93,13 @@ class GUI:
                 right = None
 
                 if i - 1 >= 0:
-                    top = (i - 1, j)
+                    top = f"x{i-1}y{j}"
                 if i + 1 <= self.grid_rows - 1:
-                    bottom = (i + 1, j)
+                    bottom = f"x{i+1}y{j}"
                 if j - 1 >= 0:
-                    left = (i, j - 1)
+                    left = f"x{i}y{j-1}"
                 if j + 1 <= self.grid_columns - 1:
-                    right = (i, j + 1)
+                    right = f"x{i}y{j+1}"
 
                 self.grid_dict[f'x{i}y{j}'] = {"label": label,
                                              "color": "white",
@@ -102,11 +108,13 @@ class GUI:
                                              "top" : top,
                                              "bottom": bottom,
                                              "left": left,
-                                             "right": right}
+                                             "right": right,
+                                             "id" : f'x{i}y{j}'}
         self.wndw_frame.pack()
-    
+
     def initiate_search(self):
-        BFS(self.grid_dict)
+        BFS(self.get_dictionary(), self.adjust_colors)
+        pprint(self.get_dictionary())
 
     def change_color(self, x, y, color):
         """
@@ -217,6 +225,7 @@ class GUI:
             self.change_color(x, y, "black")
         
     def delete_position(self):
+    
         """
         Deletes all other colors to ensure only one start and one end.
         """
@@ -233,6 +242,14 @@ class GUI:
                     y = self.grid_dict[key]["y"]
                     self.change_to_end(x, y)
 
+    def adjust_colors(self, id):
+        self.grid_dict[id]["label"].configure(background=self.grid_dict[id]["color"])
+
+    def clear_grid(self):
+        for i in self.grid_dict:
+            self.grid_dict[i]["color"] = "white"
+            self.adjust_colors(i)
+
     def do_loop(self):
         """
         Loop the GUI
@@ -243,7 +260,9 @@ class GUI:
         """
         Returns dictionary containing the data of the grid.
         """
-        pprint.pprint(self.grid_dict)
+        return self.grid_dict
 
-new_grid = GUI()
-new_grid.do_loop()
+
+if __name__ == "__main__":
+    g = GUI()
+    g.do_loop()
