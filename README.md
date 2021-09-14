@@ -13,9 +13,9 @@ In the future I want to add more graphing algorithms, add a weights option to th
 
 All that is needed are the gui.py and mazeHunter.py files in the same source folder and run the gui.py file.
 
-'''
+```
 python3 gui.py
-'''
+```
 
 ## Usage
 
