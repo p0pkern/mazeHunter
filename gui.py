@@ -1,9 +1,16 @@
 import tkinter as tk
 from mazeHunter import BFS, DFS
-from pprint import pprint
 
 class GUI:
-    
+    """
+    This is the main grid and gui interface for the maze hunter.
+    The grid size is pre-set to 25 rows and 70 columns. This is chosen to 
+    look good on a smaller screen that I have, and also running efficiently.
+
+    It could be adjusted larger, but I feel like in it's current state it is 
+    just enough to get the ponit accross.
+    """
+
     def __init__(self):
         self.window = tk.Tk()
         self.window.resizable(False, False)
@@ -75,7 +82,7 @@ class GUI:
                             relief=tk.SUNKEN)
         self.grid_frame.pack()
 
-        # Bottom Console
+        # Bottom Square
         self.bottom_frame = tk.Frame(master=self.wndw_frame,
                                 width=800,
                                 height=20)
@@ -120,12 +127,16 @@ class GUI:
         self.wndw_frame.pack()
 
     def initiate_BFS(self):
+        """
+        Activate the breadth first search. 
+        """
         BFS(self.get_dictionary(), self.adjust_colors)
-        pprint(self.get_dictionary())
     
     def initiate_DFS(self):
+        """
+        Activate Depth first search.
+        """
         DFS(self.get_dictionary(), self.adjust_colors)
-        pprint(self.get_dictionary())
 
     def change_color(self, x, y, color):
         """
@@ -230,13 +241,15 @@ class GUI:
             self.change_color(x, y, "white")
     
     def create_barrier(self, x, y):
+        """
+        Changes the correspoding square to black, to indicate it is a barrier
+        """
         if self.grid_dict[f'x{x}y{y}']["color"] == "green" or self.grid_dict[f'x{x}y{y}']["color"] == "red":
             return
         elif self.grid_dict[f'x{x}y{y}']["color"] == "white":
             self.change_color(x, y, "black")
         
     def delete_position(self):
-    
         """
         Deletes all other colors to ensure only one start and one end.
         """
@@ -254,9 +267,17 @@ class GUI:
                     self.change_to_end(x, y)
 
     def adjust_colors(self, id):
+        """
+        Callable function for the algorithms that will update the colors of the grid.
+        Currently this function does not work how I hope and I'm looking into options
+        on how to get the desired effect.
+        """
         self.grid_dict[id]["label"].configure(background=self.grid_dict[id]["color"])
 
     def clear_grid(self):
+        """
+        Clears the grid by setting all grid items to the color white indicating it is blank.
+        """
         for i in self.grid_dict:
             self.grid_dict[i]["color"] = "white"
             self.adjust_colors(i)
