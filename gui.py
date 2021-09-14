@@ -1,5 +1,5 @@
 import tkinter as tk
-from mazeHunter import BFS
+from mazeHunter import BFS, DFS
 from pprint import pprint
 
 class GUI:
@@ -45,16 +45,23 @@ class GUI:
         self.barrier_button_toggled = False
 
         # Start Search
-        self.start_search_button = tk.Button(master=self.top_frame,
-                                      text="Run Maze",
+        self.start_BFS = tk.Button(master=self.top_frame,
+                                      text="Breadth First Search",
                                       pady=5,
-                                      command=self.initiate_search)
+                                      command=self.initiate_BFS)
 
-        self.start_search_button.pack(side=tk.LEFT, padx=10)
-        self.toggle_start_search = False
+        self.start_BFS.pack(side=tk.LEFT, padx=10)
 
+        self.start_DFS = tk.Button(master=self.top_frame,
+                                      text="Depth First Search",
+                                      pady=5,
+                                      command=self.initiate_DFS)
+
+        self.start_DFS.pack(side=tk.LEFT, padx=10)
+
+        # Clear Grid
         self.clear_grid_button = tk.Button(master= self.top_frame,
-                                           text="clear grid",
+                                           text="Clear Grid",
                                            pady=5,
                                            command=self.clear_grid)
         
@@ -112,8 +119,12 @@ class GUI:
                                              "id" : f'x{i}y{j}'}
         self.wndw_frame.pack()
 
-    def initiate_search(self):
+    def initiate_BFS(self):
         BFS(self.get_dictionary(), self.adjust_colors)
+        pprint(self.get_dictionary())
+    
+    def initiate_DFS(self):
+        DFS(self.get_dictionary(), self.adjust_colors)
         pprint(self.get_dictionary())
 
     def change_color(self, x, y, color):
